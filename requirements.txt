@@ -1,2 +1,4 @@
 psutil==5.7.0
 pulsectl==20.4.3
+BeautifulSoup4==4.9.0
+requests==2.23.0
