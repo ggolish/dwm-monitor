@@ -18,15 +18,19 @@ DEFAULT_CONFIG = {
     "update_interval": 0.25,
     "weather_interval": 300.0,
     "weather_url": "https://weather.com/weather/today/l/f4486c561c03c078e900d35ff13390398a4d73bed67c8b78fbcd1e129491db92",
+    "cpu_sensor_dev": "k10temp",
+    "cpu_sensor_label": "Tdie",
+    "gpu_sensor_dev": "amdgpu",
+    "gpu_sensor_label": "edge",
 }
 STATUS_GLOBALS = {
     "date": "",
     "weather": "",
     "volume": "",
-    "mute": "",
     "ram": "",
     "cpu": "",
     "gpu": "",
+    "track": "",
 }
 
 
@@ -50,7 +54,8 @@ def update_status():
     topbar_status = " | ".join([STATUS_GLOBALS[k]
                                 for k in ["weather", "date"]])
     bottombar_status = " | ".join([STATUS_GLOBALS[k]
-                                   for k in ["volume"]])
+                                   for k in ["volume", "ram",
+                                             "cpu", "gpu", "track"]])
     cmd(f"xsetroot -name '{topbar_status};{bottombar_status}'")
 
 
@@ -68,6 +73,25 @@ def main(args):
     config = load_config(path=args.config)
     launch_update_method(stats.get_date, 1.0, "date")
     launch_update_method(stats.get_volume, config["update_interval"], "volume")
+    launch_update_method(stats.get_ram, config["update_interval"], "ram")
+    launch_update_method(stats.get_current_track,
+                         config["update_interval"], "track")
+    launch_update_method(
+        stats.get_cpu,
+        config["update_interval"], "cpu",
+        args=[
+            config["cpu_sensor_dev"],
+            config["cpu_sensor_label"]
+        ]
+    )
+    launch_update_method(
+        stats.get_gpu,
+        config["update_interval"], "gpu",
+        args=[
+            config["gpu_sensor_dev"],
+            config["gpu_sensor_label"]
+        ]
+    )
     launch_update_method(weather.retrieve_report, config["weather_interval"],
                          "weather", args=[config["weather_url"]])
     while True:
