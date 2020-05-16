@@ -49,7 +49,9 @@ def update_status():
     global STATUS_GLOBALS
     topbar_status = " | ".join([STATUS_GLOBALS[k]
                                 for k in ["weather", "date"]])
-    cmd(f"xsetroot -name '{topbar_status}'")
+    bottombar_status = " | ".join([STATUS_GLOBALS[k]
+                                   for k in ["volume"]])
+    cmd(f"xsetroot -name '{topbar_status};{bottombar_status}'")
 
 
 def launch_update_method(method, interval, key, args=[]):
@@ -65,6 +67,7 @@ def main(args):
     global STATUS_GLOBALS
     config = load_config(path=args.config)
     launch_update_method(stats.get_date, 1.0, "date")
+    launch_update_method(stats.get_volume, config["update_interval"], "volume")
     launch_update_method(weather.retrieve_report, config["weather_interval"],
                          "weather", args=[config["weather_url"]])
     while True:
