@@ -49,6 +49,13 @@ def load_config(path):
     return config
 
 
+def store_default_config():
+    global DEFAULT_CONFIG, DEFAULT_CONFIG_PATH
+    with open(DEFAULT_CONFIG_PATH, "w") as fd:
+        json.dump(DEFAULT_CONFIG, fd, sort_keys=True,
+                  indent=4, separators=(",", ": "))
+
+
 def update_status():
     global STATUS_GLOBALS
     topbar_status = " | ".join([STATUS_GLOBALS[k]
@@ -101,12 +108,18 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+    parser.add_argument("--store-config", action="store_true",
+                        help=f"Store default config file at {DEFAULT_CONFIG_PATH}")
     parser.add_argument("--config", type=str, default=DEFAULT_CONFIG_PATH,
                         help=f"Path to config file, default is {DEFAULT_CONFIG_PATH}")
     parser.add_argument("--log", type=str, default="WARNING",
                         help="Log level: DEBUG | INFO | WARNING")
 
     args = parser.parse_args(sys.argv[1:])
+
+    if args.store_config:
+        store_default_config()
+        exit()
 
     log_level = getattr(logging, args.log.upper())
     logging.basicConfig(level=log_level, format='%(asctime)s %(message)s')
