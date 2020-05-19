@@ -15,7 +15,8 @@ import weather
 
 DEFAULT_CONFIG_PATH = join(expanduser("~"), ".dwmstatus")
 DEFAULT_CONFIG = {
-    "update_interval": 0.25,
+    "update_interval": 0.5,
+    "hardware_interval": 1.0,
     "weather_interval": 300.0,
     "weather_url": "https://weather.com/weather/today/l/f4486c561c03c078e900d35ff13390398a4d73bed67c8b78fbcd1e129491db92",
     "cpu_sensor_dev": "k10temp",
@@ -78,14 +79,14 @@ def launch_update_method(method, interval, key, args=[]):
 def main(args):
     global STATUS_GLOBALS
     config = load_config(path=args.config)
-    launch_update_method(stats.get_date, 1.0, "date")
+    launch_update_method(stats.get_date, config["update_interval"], "date")
     launch_update_method(stats.get_volume, config["update_interval"], "volume")
-    launch_update_method(stats.get_ram, config["update_interval"], "ram")
+    launch_update_method(stats.get_ram, config["hardware_interval"], "ram")
     launch_update_method(stats.get_current_track,
                          config["update_interval"], "track")
     launch_update_method(
         stats.get_cpu,
-        config["update_interval"], "cpu",
+        config["hardware_interval"], "cpu",
         args=[
             config["cpu_sensor_dev"],
             config["cpu_sensor_label"]
@@ -93,7 +94,7 @@ def main(args):
     )
     launch_update_method(
         stats.get_gpu,
-        config["update_interval"], "gpu",
+        config["hardware_interval"], "gpu",
         args=[
             config["gpu_sensor_dev"],
             config["gpu_sensor_label"]
