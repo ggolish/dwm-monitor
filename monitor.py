@@ -5,8 +5,10 @@ import json
 import argparse
 import sys
 import logging
+import psutil
 
 from os.path import expanduser, join, exists
+from os import getpid
 from threading import Timer
 from subprocess import getoutput as cmd
 
@@ -33,6 +35,12 @@ STATUS_GLOBALS = {
     "gpu": "",
     "track": "",
 }
+
+
+def reap_zombies():
+    for p in psutil.process_iter():
+        if "dwm-monitor" in p.name() and p.pid != getpid():
+            p.kill()
 
 
 def load_config(path):
@@ -78,6 +86,7 @@ def launch_update_method(method, interval, key, args=[]):
 
 def main(args):
     global STATUS_GLOBALS
+    reap_zombies()
     config = load_config(path=args.config)
     launch_update_method(stats.get_date, config["update_interval"], "date")
     launch_update_method(stats.get_volume, config["update_interval"], "volume")
