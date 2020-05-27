@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 
 
-def retrieve_report(url):
+def retrieve_report(url, tries=0):
     try:
         req = requests.get(url)
         soup = BeautifulSoup(req.content, "html.parser")
@@ -10,6 +10,7 @@ def retrieve_report(url):
         wstats["curr_temp"] = soup.find(
             class_="today_nowcard-temp").find("span").text
         wstats["desc"] = soup.find(class_="today_nowcard-phrase").text
+        print("here")
         warning = soup.find("span", class_="warning-text")
         if warning:
             wstats["desc"] += f" ({warning.text.upper()})"
@@ -19,7 +20,9 @@ def retrieve_report(url):
             return f"{wstats['desc']} {wstats['curr_temp']} ({wstats['high_temp']}▼)"
         else:
             return f"{wstats['desc']} {wstats['curr_temp']} ({wstats['low_temp']}▼, {wstats['high_temp']}▲)"
-    except:
+    except Exception as e:
+        if tries < 3:
+            return retrieve_report(url, tries=tries+1)
         return "Unable to retrieve weather data"
 
 
