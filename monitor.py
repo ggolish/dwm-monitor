@@ -16,6 +16,7 @@ import stats
 import weather
 
 DEFAULT_CONFIG_PATH = join(expanduser("~"), ".dwmstatus")
+DEFAULT_LOG_PATH = join(expanduser("~"), ".dwmlog")
 DEFAULT_CONFIG = {
     "update_interval": 0.5,
     "hardware_interval": 1.0,
@@ -88,14 +89,35 @@ def main(args):
     global STATUS_GLOBALS
     reap_zombies()
     config = load_config(path=args.config)
-    launch_update_method(stats.get_date, config["update_interval"], "date")
-    launch_update_method(stats.get_volume, config["update_interval"], "volume")
-    launch_update_method(stats.get_ram, config["hardware_interval"], "ram")
-    launch_update_method(stats.get_current_track,
-                         config["update_interval"], "track")
+
+    launch_update_method(
+        stats.get_date,
+        config["update_interval"],
+        "date"
+    )
+
+    launch_update_method(
+        stats.get_volume,
+        config["update_interval"],
+        "volume"
+    )
+
+    launch_update_method(
+        stats.get_ram,
+        config["hardware_interval"],
+        "ram"
+    )
+
+    launch_update_method(
+        stats.get_current_track,
+        config["update_interval"],
+        "track"
+    )
+
     launch_update_method(
         stats.get_cpu,
-        config["hardware_interval"], "cpu",
+        config["hardware_interval"],
+        "cpu",
         args=[
             config["cpu_sensor_dev"],
             config["cpu_sensor_label"]
@@ -103,14 +125,23 @@ def main(args):
     )
     launch_update_method(
         stats.get_gpu,
-        config["hardware_interval"], "gpu",
+        config["hardware_interval"],
+        "gpu",
         args=[
             config["gpu_sensor_dev"],
             config["gpu_sensor_label"]
         ]
     )
-    launch_update_method(weather.retrieve_report, config["weather_interval"],
-                         "weather", args=[config["weather_url"]])
+
+    launch_update_method(
+        weather.retrieve_report,
+        config["weather_interval"],
+        "weather",
+        args=[
+            config["weather_url"]
+        ]
+    )
+
     while True:
         update_status()
         time.sleep(config["update_interval"])
@@ -132,6 +163,7 @@ if __name__ == "__main__":
         exit()
 
     log_level = getattr(logging, args.log.upper())
-    logging.basicConfig(level=log_level, format='%(asctime)s %(message)s')
+    logging.basicConfig(filename=DEFAULT_LOG_PATH,
+                        level=log_level, format='%(asctime)s %(message)s')
 
     main(args)
