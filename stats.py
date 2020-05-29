@@ -9,7 +9,7 @@ PULSE = pulsectl.Pulse()
 def progress_fmt(x):
     n = int(x * 10)
     m = int(x * 100) % 10
-    return "[" + "#" * n + str(m) + " " * (9 - n) + "]"
+    return "[" + "#" * n + str(m) + "-" * (9 - n) + "]"
 
 
 def get_date():
