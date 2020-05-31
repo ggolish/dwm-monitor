@@ -5,6 +5,9 @@ import os
 
 PULSE = pulsectl.Pulse()
 
+NET_PREV_RXBYTES = 0
+NET_PREV_TXBYTES = 0
+
 
 def progress_fmt(x):
     n = int(x * 10)
@@ -59,3 +62,24 @@ def get_current_track():
             if p.status() == "stopped":
                 curr_track += " (PAUSED)"
     return curr_track
+
+
+def get_net():
+    global NET_PREV_RXBYTES, NET_PREV_TXBYTES
+    devpath = "/sys/class/net"
+    devs = [os.path.join(devpath, f) for f in os.listdir(devpath)]
+    netfiles = [(os.path.join(d, "statistics", "rx_bytes"),
+                 os.path.join(d, "statistics", "tx_bytes")) for d in devs]
+    curr_rxbytes, curr_txbytes = 0, 0
+    for rxpath, txpath in netfiles:
+        with open(rxpath, "r") as fd:
+            curr_rxbytes += float(fd.read())
+        with open(txpath, "r") as fd:
+            curr_txbytes += float(fd.read())
+
+    net_down = curr_rxbytes - NET_PREV_RXBYTES
+    net_up = curr_txbytes - NET_PREV_TXBYTES
+    NET_PREV_RXBYTES = curr_rxbytes
+    NET_PREV_TXBYTES = curr_txbytes
+
+    return f"{net_down / 1024:0.2f} KiB ▼ | {net_up / 1024:0.2f} KiB ▲"

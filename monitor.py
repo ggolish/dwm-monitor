@@ -35,6 +35,7 @@ STATUS_GLOBALS = {
     "cpu": "",
     "gpu": "",
     "track": "",
+    "net": ""
 }
 
 
@@ -72,7 +73,7 @@ def update_status():
                                 for k in ["weather", "date"]])
     bottombar_status = " | ".join([STATUS_GLOBALS[k]
                                    for k in ["volume", "ram",
-                                             "cpu", "gpu", "track"]])
+                                             "cpu", "gpu", "net", "track"]])
     cmd(f"xsetroot -name '{topbar_status};{bottombar_status}'")
 
 
@@ -106,6 +107,12 @@ def main(args):
         stats.get_ram,
         config["hardware_interval"],
         "ram"
+    )
+
+    launch_update_method(
+        stats.get_net,
+        config["hardware_interval"],
+        "net"
     )
 
     launch_update_method(
