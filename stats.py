@@ -82,4 +82,13 @@ def get_net():
     NET_PREV_RXBYTES = curr_rxbytes
     NET_PREV_TXBYTES = curr_txbytes
 
-    return f"{net_down / 1024:0.2f} KiB ▼ | {net_up / 1024:0.2f} KiB ▲"
+    return f"{format_net(net_down)} ▼ | {format_net(net_up)} ▲"
+
+
+def format_net(x):
+    units = [" B", "KB", "MB", "GB", "TB"]
+    unit = 0
+    while x >= 1000 and unit != len(units) - 1:
+        x /= 1000
+        unit += 1
+    return f"{x:6.2f} {units[unit]}"
