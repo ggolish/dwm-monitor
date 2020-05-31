@@ -14,6 +14,7 @@ from subprocess import getoutput as cmd
 
 import stats
 import weather
+import covid
 
 DEFAULT_CONFIG_PATH = join(expanduser("~"), ".dwmstatus")
 DEFAULT_LOG_PATH = join(expanduser("~"), ".dwmlog")
@@ -21,6 +22,7 @@ DEFAULT_CONFIG = {
     "update_interval": 0.5,
     "hardware_interval": 1.0,
     "weather_interval": 300.0,
+    "covid_interval": 3600.0 * 24.0,
     "weather_url": "https://weather.com/weather/today/l/f4486c561c03c078e900d35ff13390398a4d73bed67c8b78fbcd1e129491db92",
     "cpu_sensor_dev": "k10temp",
     "cpu_sensor_label": "Tdie",
@@ -35,7 +37,8 @@ STATUS_GLOBALS = {
     "cpu": "",
     "gpu": "",
     "track": "",
-    "net": ""
+    "net": "",
+    "covid": ""
 }
 
 
@@ -70,7 +73,7 @@ def store_default_config():
 def update_status():
     global STATUS_GLOBALS
     topbar_status = " | ".join([STATUS_GLOBALS[k]
-                                for k in ["weather", "date"]])
+                                for k in ["weather", "covid", "date"]])
     bottombar_status = " | ".join([STATUS_GLOBALS[k]
                                    for k in ["volume", "ram",
                                              "cpu", "gpu", "net", "track"]])
@@ -147,6 +150,12 @@ def main(args):
         args=[
             config["weather_url"]
         ]
+    )
+
+    launch_update_method(
+        covid.covid_report,
+        config["covid_interval"],
+        "covid"
     )
 
     while True:
