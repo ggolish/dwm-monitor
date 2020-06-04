@@ -8,14 +8,13 @@ def retrieve_report(url, tries=0, max_tries=10):
         req = requests.get(url)
         soup = BeautifulSoup(req.content, "html.parser")
         wstats = {}
-        wstats["curr_temp"] = soup.find(
-            class_="today_nowcard-temp").find("span").text
-        wstats["desc"] = soup.find(class_="today_nowcard-phrase").text
+        wstats["curr_temp"] = soup.find("span", {"data-testid": "TemperatureValue"}).text
+        wstats["desc"] = soup.find("div", {"data-testid": "wxPhrase"}).text
         warning = soup.find("span", class_="warning-text")
         if warning:
             wstats["desc"] += f" ({warning.text.upper()})"
         wstats["low_temp"], wstats["high_temp"] = sorted(
-            [e.find("span").text for e in soup.find_all(class_="deg-hilo-nowcard")])
+                [e.text for e in soup.find_all("span", {"data-testid": "TemperatureValue"})[1:3]])
         if wstats["low_temp"] == "--":
             return f"{wstats['desc']} {wstats['curr_temp']} ({wstats['high_temp']}▼)"
         else:
