@@ -21,7 +21,7 @@ def retrieve_report(url, tries=0, max_tries=10):
         else:
             return f"{wstats['desc']} {wstats['curr_temp']} ({wstats['low_temp']}▼, {wstats['high_temp']}▲)"
     except Exception as e:
-        logging.warning(str(e))
+        logging.warning(f"Unable to retrieve weather data: {str(e)}")
         if tries < max_tries:
             return retrieve_report(url, tries=tries+1)
         return "Unable to retrieve weather data"

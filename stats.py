@@ -2,6 +2,7 @@ import datetime
 import pulsectl
 import psutil
 import os
+import logging 
 
 PULSE = pulsectl.Pulse()
 
@@ -55,12 +56,15 @@ def get_gpu(dev, label):
 
 def get_current_track():
     curr_track = "Nothing is playing...."
-    for p in psutil.process_iter():
-        if p.name().startswith("mpg123"):
-            track_name = os.path.split(p.open_files()[1].path)[-1]
-            curr_track = f"Now playing: {track_name}"
-            if p.status() == "stopped":
-                curr_track += " (PAUSED)"
+    try:
+        for p in psutil.process_iter():
+            if p.name().startswith("mpg123"):
+                track_name = os.path.split(p.open_files()[1].path)[-1]
+                curr_track = f"Now playing: {track_name}"
+                if p.status() == "stopped":
+                    curr_track += " (PAUSED)"
+    except Exception as e:
+        logging.warn(f"Error parsing track info: {str(e)}")
     return curr_track
 
 
