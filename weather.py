@@ -1,5 +1,6 @@
 import requests
 import logging
+import time
 from bs4 import BeautifulSoup
 
 
@@ -22,6 +23,7 @@ def retrieve_report(url, tries=0, max_tries=10):
     except Exception as e:
         logging.warning(f"Unable to retrieve weather data: {str(e)}")
         if tries < max_tries:
+            time.sleep(5)
             return retrieve_report(url, tries=tries+1)
         return "Unable to retrieve weather data"
 
