@@ -28,6 +28,7 @@ DEFAULT_CONFIG = {
     "cpu_sensor_label": "Tdie",
     "gpu_sensor_dev": "amdgpu",
     "gpu_sensor_label": "edge",
+    "battery": False,
 }
 STATUS_GLOBALS = {
     "date": "",
@@ -38,7 +39,8 @@ STATUS_GLOBALS = {
     "gpu": "",
     "track": "",
     "net": "",
-    "covid": ""
+    "covid": "",
+    "battery": "",
 }
 
 
@@ -73,7 +75,7 @@ def store_default_config():
 def update_status():
     global STATUS_GLOBALS
     topbar_status = " | ".join([STATUS_GLOBALS[k]
-                                for k in ["weather", "covid", "date"]])
+                                for k in ["weather", "covid", "date", "battery"]])
     bottombar_status = " | ".join([STATUS_GLOBALS[k]
                                    for k in ["volume", "ram",
                                              "cpu", "gpu", "net", "track"]])
@@ -157,6 +159,13 @@ def main(args):
         config["covid_interval"],
         "covid"
     )
+
+    if config["battery"]:
+        launch_update_method(
+            stats.get_battery,
+            config["hardware_interval"],
+            "battery"
+        )
 
     while True:
         update_status()

@@ -96,3 +96,23 @@ def format_net(x):
         x /= 1000
         unit += 1
     return f"{x:6.2f} {units[unit]}"
+
+
+def get_battery():
+    devpath = "/sys/class/power_supply"
+    devs = [os.path.join(devpath, f) for f in os.listdir(devpath) if f.startswith("BAT")]
+    batfiles = [(os.path.join(dev, "capacity"), 
+                 os.path.join(dev, "status")) for dev in devs]
+    cap = 0.0
+    count = 0
+    status = "🗲"
+    for cappath, statuspath in batfiles:
+        count += 1
+        with open(cappath, "r") as fd:
+            cap += float(fd.read())
+        with open(statuspath, "r") as fd:
+            if fd.read().strip() == "Discharging":
+                status = "▼"
+    cap = (cap if count == 0 else cap / count) / 100.0
+    return f"{status} {progress_fmt(cap)}"
+
