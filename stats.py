@@ -4,6 +4,8 @@ import psutil
 import os
 import logging 
 
+from subprocess import run 
+
 PULSE = pulsectl.Pulse()
 
 NET_PREV_RXBYTES = 0
@@ -54,18 +56,14 @@ def get_gpu(dev, label):
     return f"GPU: {temp}"
 
 
-def get_current_track():
-    curr_track = "Nothing is playing...."
+def get_current_track(mpchost, mpcport):
     try:
-        for p in psutil.process_iter():
-            if p.name().startswith("mpg123"):
-                track_name = os.path.split(p.open_files()[1].path)[-1]
-                curr_track = f"Now playing: {track_name}"
-                if p.status() == "stopped":
-                    curr_track += " (PAUSED)"
+        x = run(["mpc", f"--host={mpchost}", f"--port={mpcport}", "current"], capture_output=True)
+        value = x.stdout.decode().strip()
     except Exception as e:
-        logging.warn(f"Error parsing track info: {str(e)}")
-    return curr_track
+        logging.warn(f"Failed to run mpc: {str(e)}")
+        return "Failed to search for tracks..."
+    return "Nothing is playing..." if not value else value
 
 
 def get_net():

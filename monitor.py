@@ -29,6 +29,8 @@ DEFAULT_CONFIG = {
     "gpu_sensor_dev": "amdgpu",
     "gpu_sensor_label": "edge",
     "battery": False,
+    "mpchost": "/home/ggolish/.config/mpd/socket",
+    "mpcport": "6600"
 }
 STATUS_GLOBALS = {
     "date": "",
@@ -123,7 +125,11 @@ def main(args):
     launch_update_method(
         stats.get_current_track,
         config["update_interval"],
-        "track"
+        "track",
+        args=[
+            config["mpchost"],
+            config["mpcport"]
+        ]
     )
 
     launch_update_method(
