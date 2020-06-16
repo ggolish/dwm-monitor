@@ -62,7 +62,9 @@ def get_current_track(mpchost, mpcport):
         value = x.stdout.decode().strip()
         pieces = value.split("\n")
         if len(pieces) > 1:
-            value = " ".join(x.stdout.decode().split("\n")[:2])
+            if len(pieces[0]) > 40:
+                pieces[0] = pieces[0][:40] + "..."
+            value = " ".join(pieces[:2])
         else:
             value = "Nothing is playing..."
     except Exception as e:
