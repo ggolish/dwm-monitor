@@ -25,12 +25,12 @@ def get_stats(data_url, data_path):
     with open(data_path, "r") as fd:
         df = pandas.read_csv(fd)
 
-    yesterday, today = list(df[df["Province_State"] == "Indiana"].sum())[-2:]
-    return today, today - yesterday
+    yesteryesterday, yesterday, today = list(df[df["Province_State"] == "Indiana"].sum())[-3:]
+    return today, today - yesterday, yesterday - yesteryesterday
 
 
 def format_stats(stats):
-    modifier = "▼" if stats[1] <= 0 else "▲"
+    modifier = "▼" if stats[1] <= stats[2] else "▲"
     return f"{stats[0]} ({stats[1]} {modifier})"
 
 
