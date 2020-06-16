@@ -58,12 +58,17 @@ def get_gpu(dev, label):
 
 def get_current_track(mpchost, mpcport):
     try:
-        x = run(["mpc", f"--host={mpchost}", f"--port={mpcport}", "current"], capture_output=True)
+        x = run(["mpc", f"--host={mpchost}", f"--port={mpcport}", "status"], capture_output=True)
         value = x.stdout.decode().strip()
+        pieces = value.split("\n")
+        if len(pieces) > 1:
+            value = " ".join(x.stdout.decode().split("\n")[:2])
+        else:
+            value = "Nothing is playing..."
     except Exception as e:
         logging.warn(f"Failed to run mpc: {str(e)}")
         return "Failed to search for tracks..."
-    return "Nothing is playing..." if not value else value
+    return value
 
 
 def get_net():
