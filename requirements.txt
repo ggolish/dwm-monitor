@@ -1,6 +1,6 @@
-psutil==5.7.0
-pulsectl==20.4.3
-BeautifulSoup4==4.9.0
-requests==2.23.0
-pyinstaller==3.6
-pandas==1.0.3
+psutil>=5.7.0
+pulsectl>=20.4.3
+BeautifulSoup4>=4.9.0
+requests>=2.23.0
+pyinstaller>=3.6
+pandas>=1.0.3

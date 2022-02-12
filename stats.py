@@ -43,9 +43,16 @@ def get_cpu(dev, label):
     p = psutil.cpu_percent()
     p /= 100
     temp = ""
-    for d in psutil.sensors_temperatures()[dev]:
+    devices = psutil.sensors_temperatures()
+    if dev not in devices:
+        logging.warn(f"device {dev} not found in temperature sensors '{devices.keys()}'")
+        return f"CPU: {dev} not found"
+    for d in devices[dev]:
         if d.label == label:
             temp = f"{d.current:0.2f}°C"
+        else:
+            logging.warn(f"label {label} not found in temperature sensors '{d.label}'")
+            temp = f"temp failure"
     return f"CPU: {progress_fmt(p)} {temp}"
 
 
