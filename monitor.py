@@ -191,7 +191,7 @@ if __name__ == "__main__":
 
     if args.store_config:
         store_default_config()
-        exit()
+        sys.exit()
 
     log_level = getattr(logging, args.log.upper())
     logging.basicConfig(filename=DEFAULT_LOG_PATH,
