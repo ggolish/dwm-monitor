@@ -128,3 +128,8 @@ def get_battery():
     cap = (cap if count == 0 else cap / count) / 100.0
     return f"{status} {progress_fmt(cap)}"
 
+def get_pacman_updates():
+    x = run(["pacman", "-Qu"], capture_output=True)
+    n = len(x.stdout.decode().splitlines())
+    return "System is up to date" if n == 0 else f"{n} updates available"
+
