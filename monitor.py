@@ -10,7 +10,7 @@ import psutil
 from os.path import expanduser, join, exists
 from os import getpid
 from threading import Timer
-from subprocess import getoutput as cmd
+from subprocess import run
 
 import stats
 import weather
@@ -81,7 +81,11 @@ def update_status():
     bottombar_status = " | ".join([STATUS_GLOBALS[k]
                                    for k in ["volume", "ram",
                                              "cpu", "gpu", "net", "track"]])
-    cmd(f"xsetroot -name '{topbar_status};{bottombar_status}'")
+    x = run(["xsetroot", "-name", f"{topbar_status};{bottombar_status}"], capture_output=True)
+    if x.returncode != 0:
+        logging.warn(f"xsetroot failure: {x.stderr.decode()}")
+        run(["xsetroot", "-name", "xsetroot failure!"])
+
 
 
 def launch_update_method(method, interval, key, args=[]):

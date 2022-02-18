@@ -66,6 +66,8 @@ def get_gpu(dev, label):
 def get_current_track(mpchost, mpcport):
     try:
         x = run(["mpc", f"--host={mpchost}", f"--port={mpcport}", "status"], capture_output=True)
+        if x.returncode != 0:
+            raise Exception(f"mpc failure: {x.stderr.decode()}")
         value = x.stdout.decode().strip()
         pieces = value.split("\n")
         if len(pieces) > 1:
