@@ -30,7 +30,8 @@ DEFAULT_CONFIG = {
     "gpu_sensor_label": "edge",
     "battery": False,
     "mpchost": "/home/ggolish/.config/mpd/socket",
-    "mpcport": "6600"
+    "mpcport": "6600",
+    "phone_interval": 0,
 }
 STATUS_GLOBALS = {
     "date": "",
@@ -43,6 +44,8 @@ STATUS_GLOBALS = {
     "track": "",
     "net": "",
     "battery": "",
+    "pacman": "",
+    "phone": "", 
 }
 
 
@@ -76,16 +79,14 @@ def store_default_config():
 
 def update_status():
     global STATUS_GLOBALS
-    topbar_status = " | ".join([STATUS_GLOBALS[k]
-                                for k in ["weather", "pacman", "date", "battery"]])
-    bottombar_status = " | ".join([STATUS_GLOBALS[k]
-                                   for k in ["volume", "ram",
-                                             "cpu", "gpu", "net", "track"]])
+    topbar_status = " | ".join([STATUS_GLOBALS[k] for k in ["weather",
+        "pacman", "date", "phone", "battery"] if STATUS_GLOBALS[k] != ""])
+    bottombar_status = " | ".join([STATUS_GLOBALS[k] for k in ["volume", "ram",
+        "cpu", "gpu", "net", "track"] if STATUS_GLOBALS[k] != ""])
     x = run(["xsetroot", "-name", f"{topbar_status};{bottombar_status}"], capture_output=True)
     if x.returncode != 0:
         logging.warn(f"xsetroot failure: {x.stderr.decode()}")
         run(["xsetroot", "-name", "xsetroot failure!"])
-
 
 
 def launch_update_method(method, interval, key, args=[]):
@@ -176,6 +177,13 @@ def main(args):
             stats.get_pacman_updates,
             config["pacman_interval"],
             "pacman"
+        )
+
+    if config["phone_interval"] > 0:
+        launch_update_method(
+            stats.get_phone_connection,
+            config["phone_interval"],
+            "phone"
         )
 
     while True:

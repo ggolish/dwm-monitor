@@ -3,6 +3,7 @@ import pulsectl
 import psutil
 import os
 import logging 
+import ipaddress
 
 from subprocess import run 
 
@@ -134,4 +135,46 @@ def get_pacman_updates():
     x = run(["pacman", "-Qu"], capture_output=True)
     n = len(x.stdout.decode().splitlines())
     return "System is up to date" if n == 0 else f"{n} updates available"
+
+def get_phone_connection():
+    try:
+        x = run(["adb", "devices"], capture_output=True)
+    except Exception as e:
+        logging.error(f"can't check phone connection: {e}")
+        return "Unable to check phone connection"
+
+    devices = x.stdout.decode().splitlines()[1:]
+    if len(devices) == 0 or devices[0] == "":
+        return "phone is not connected"
+
+    def is_ip_address(device):
+        if ":" not in device:
+            return False
+        ip, port = device.split(":")
+        try:
+            ipaddress.ip_address(ip)
+            return True
+        except:
+            return False
+
+    wireless = False
+    wired = False
+    for line in devices:
+        if line == "":
+            continue
+        device = line.split()[0]
+        if is_ip_address(device):
+            wireless = True
+        else:
+            wired = True
+    if wireless and wired:
+        return "phone connected, please disconnect"
+    elif wireless:
+        return "phone is connected"
+    elif wired:
+        return "phone is ready to be connected"
+
+    return "unknown error"
+
+
 
