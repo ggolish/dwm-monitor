@@ -48,19 +48,26 @@ def get_cpu(dev, label):
     if dev not in devices:
         logging.warn(f"device {dev} not found in temperature sensors '{devices.keys()}'")
         return f"CPU: {dev} not found"
-    for d in devices[dev]:
-        if d.label == label:
-            temp = f"{d.current:0.2f}°C"
-        else:
-            logging.warn(f"label {label} not found in temperature sensors '{d.label}'")
-            temp = f"temp failure"
+    device = [d for d in devices[dev] if d.label == label]
+    if not device:
+        logging.warn(f"label {label} not found in temperature sensors '{[d.label for d in devices[dev]]}'")
+        temp = f"temp failure"
+    else:
+        temp = f"{device[0].current:0.2f}°C"
     return f"CPU: {progress_fmt(p)} {temp}"
 
 
 def get_gpu(dev, label):
-    for d in psutil.sensors_temperatures()[dev]:
-        if d.label == label:
-            temp = f"{d.current:0.2f}°C"
+    devices = psutil.sensors_temperatures()
+    if dev not in devices:
+        logging.warn(f"device {dev} not found in temperature sensors '{devices.keys()}'")
+        return f"GPU: {dev} not found"
+    device = [d for d in devices[dev] if d.label == label]
+    if not device:
+        logging.warn(f"label {label} not found in temperature sensors '{[d.label for d in devices[dev]]}'")
+        temp = f"temp failure"
+    else:
+        temp = f"{device[0].current:0.2f}°C"
     return f"GPU: {temp}"
 
 
