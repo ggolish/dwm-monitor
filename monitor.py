@@ -146,15 +146,16 @@ def main(args):
             config["cpu_sensor_label"]
         ]
     )
-    launch_update_method(
-        stats.get_gpu,
-        config["hardware_interval"],
-        "gpu",
-        args=[
-            config["gpu_sensor_dev"],
-            config["gpu_sensor_label"]
-        ]
-    )
+    if config["gpu_sensor_dev"] != "":
+        launch_update_method(
+            stats.get_gpu,
+            config["hardware_interval"],
+            "gpu",
+            args=[
+                config["gpu_sensor_dev"],
+                config["gpu_sensor_label"]
+            ]
+        )
 
     launch_update_method(
         weather.retrieve_report,
