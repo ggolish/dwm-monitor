@@ -8,7 +8,7 @@ import logging
 import psutil
 
 from os.path import expanduser, join, exists
-from os import getpid
+from os import getpid, makedirs
 from threading import Timer
 from subprocess import run
 
@@ -45,7 +45,7 @@ STATUS_GLOBALS = {
     "net": "",
     "battery": "",
     "pacman": "",
-    "phone": "", 
+    "phone": "",
 }
 
 
@@ -89,6 +89,13 @@ def update_status():
         run(["xsetroot", "-name", "xsetroot failure!"])
 
 
+def store_status(dest):
+    global STATUS_GLOBALS
+    for f in STATUS_GLOBALS.keys():
+        with open(join(dest, f), "w") as fd:
+            fd.write(STATUS_GLOBALS[f])
+
+
 def launch_update_method(method, interval, key, args=[]):
     global STATUS_GLOBALS
     logging.debug(f"Running {method}, setting {key}")
@@ -102,6 +109,9 @@ def main(args):
     global STATUS_GLOBALS
     reap_zombies()
     config = load_config(path=args.config)
+
+    if args.write_files:
+        makedirs(args.write_files, exist_ok=True)
 
     launch_update_method(
         stats.get_date,
@@ -188,7 +198,10 @@ def main(args):
         )
 
     while True:
-        update_status()
+        if args.write_files:
+            store_status(args.write_files)
+        else:
+            update_status()
         time.sleep(config["update_interval"])
 
 
@@ -200,6 +213,8 @@ if __name__ == "__main__":
                         help=f"Path to config file, default is {DEFAULT_CONFIG_PATH}")
     parser.add_argument("--log", type=str, default="WARNING",
                         help="Log level: DEBUG | INFO | WARNING")
+    parser.add_argument("--write-files", type=str,
+            help="Store statuses in files at provided destination rather than writing xroot name")
 
     args = parser.parse_args(sys.argv[1:])
 
